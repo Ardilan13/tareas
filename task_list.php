@@ -1,4 +1,9 @@
 <?php include 'db_connect.php' ?>
+<style>
+	#prueba1 {
+		width: 10%;
+	}
+</style>
 <div class="col-lg-12">
 	<div class="card card-outline card-success">
 		<div class="card-header">
@@ -9,6 +14,14 @@
 			<?php endif; ?>
 		</div>
 		<div class="card-body">
+			<select multiple="multiple" id="prueba1">
+				<option value="0">0</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+			</select>
+
 			<table class="table tabe-hover table-condensed" id="list">
 
 				<thead>
@@ -106,37 +119,43 @@
 </style>
 <script>
 	$(document).ready(function() {
-		$('#list').dataTable({
+		var table = $('#list').DataTable({
 			"colReorder": true,
 			"fixedColumns": true,
 			"dom": '<"float-left"i><"float-right ml-4 mb-2"B><"float-right"f>t<"float-left"l><"float-right"p><"clearfix">',
 			"responsive": true,
 			"buttons": ['excel', 'pdf']
 		});
-		var table = $('#mydatatable').DataTable({
-			"dom": 'B<"float-left"i><"float-right"f>t<"float-left"l><"float-right"p><"clearfix">',
-			"responsive": false,
-			"language": {
-				"url": "https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-			},
-			"order": [
-				[0, "desc"]
-			],
-			"initComplete": function() {
-				this.api().columns().every(function() {
-					var that = this;
 
-					$('input', this.footer()).on('keyup change', function() {
-						if (that.search() !== this.value) {
-							that
-								.search(this.value)
-								.draw();
-						}
-					});
-				})
-			},
-			"buttons": ['csv', 'excel', 'pdf', 'print']
+		$("#prueba1").multipleSelect({
+			filter: false
 		});
+
+		$(".ms-parent ").change(function(e) {
+			e.preventDefault();
+
+			data = $("#prueba1").val();
+			i = 0;
+
+			$.each(data, (index, value) => {
+				var column = table.column(value);
+				if (column.visible() == true) {
+					column.visible(!column.visible());
+				}
+				i++;
+			});
+
+			if (i == 0) {
+				i = [0, 1, 2, 3, 4]
+				$.each(i, function(ind, elem) {
+					var column = table.column(elem);
+					if (column.visible() == false) {
+						column.visible(!column.visible());
+					}
+				});
+			}
+		});
+
 		$('#new_task').click(function() {
 			uni_modal("<i class='fa fa-plus'></i> Nueva Tarea", "manage_task.php", 'mid-large')
 		})
