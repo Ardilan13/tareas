@@ -1,7 +1,10 @@
 <?php include 'db_connect.php' ?>
 <style>
 	#prueba1 {
-		width: 10%;
+		width: 20%;
+	}
+	.ms-select-all{
+		display: none;
 	}
 </style>
 <div class="col-lg-12">
@@ -15,11 +18,14 @@
 		</div>
 		<div class="card-body">
 			<select multiple="multiple" id="prueba1">
-				<option value="0">0</option>
-				<option value="1">1</option>
-				<option value="2">2</option>
-				<option value="3">3</option>
-				<option value="4">4</option>
+				<option value="0">#</option>
+				<option value="1">Tarea</option>
+				<option value="2">Fecha Vencimiento</option>
+				<?php if ($_SESSION['login_type'] != 0) : ?>
+					<option value="3">Asignado a</option>
+				<?php endif; ?>
+				<option value="4">Estado</option>
+				<option value="5">Accion</option>
 			</select>
 
 			<table class="table tabe-hover table-condensed" id="list">
@@ -127,11 +133,36 @@
 			"buttons": ['excel', 'pdf']
 		});
 
+		$("#list").css("width","100%");
+
 		$("#prueba1").multipleSelect({
 			filter: false
 		});
 
-		$(".ms-parent ").change(function(e) {
+		$(".ms-select-all").hide()
+
+		$("#ms-drop li").css("margin-bottom","2px solid black");
+
+		$("label input[type=checkbox]").each(function(){
+        	//cada elemento seleccionado
+			if($(this).val()==0 || $(this).val()==1 || $(this).val()==2 || $(this).val()==3 || $(this).val()==4 || $(this).val()==5){
+				$(this).prop("checked",true);
+				var column = table.column($(this).val());
+				column.visible(true);
+			} else {
+				$(this).prop("checked",false);
+				var column = table.column($(this).val());
+				column.visible(false);
+			}
+			
+    	});
+
+		$("input[type=checkbox]").change(function(e){
+        	var column = table.column($(this).val());
+			column.visible(!column.visible());
+		})
+
+		/* $(".ms-parent ").change(function(e) {
 			e.preventDefault();
 
 			data = $("#prueba1").val();
@@ -154,7 +185,8 @@
 					}
 				});
 			}
-		});
+		}); */
+		
 
 		$('#new_task').click(function() {
 			uni_modal("<i class='fa fa-plus'></i> Nueva Tarea", "manage_task.php", 'mid-large')
